@@ -23,9 +23,12 @@ By the end of this lecture, students will be able to:
 
 ## Prerequisites
 
+:::{important}
+Before class, ensure you have:
 - A computer running Windows, macOS, or Linux
 - Internet connection
 - Administrative access to install software
+:::
 
 ## Part 1: GitHub Account Setup
 
@@ -48,7 +51,8 @@ GitHub provides version control and collaboration tools essential for modern com
 
 ### GitHub Student Developer Pack
 
-GitHub offers free benefits for students, including:
+:::{tip} Free Benefits for Students
+GitHub offers valuable benefits through the Student Developer Pack:
 
 - GitHub Pro (unlimited private repositories, advanced tools)
 - Free domain names
@@ -56,6 +60,7 @@ GitHub offers free benefits for students, including:
 - Developer tools and learning resources
 
 Apply at [education.github.com/pack](https://education.github.com/pack) using your JHU email.
+:::
 
 ### Installing GitHub Desktop
 
@@ -69,12 +74,17 @@ GitHub Desktop handles authentication automatically, so you won't need to config
 
 ### Configuring Git (Optional)
 
-If you prefer using the command line, configure Git:
+:::{note}
+:class: dropdown
+**For command-line users:** If you prefer using Git from the terminal, configure your identity:
 
 ```bash
 git config --global user.name "Your Name"
 git config --global user.email "your-email@jhu.edu"
 ```
+
+This step is optional if you're using GitHub Desktop exclusively.
+:::
 
 ## Part 2: Installing VS Code
 
@@ -88,11 +98,20 @@ Visual Studio Code is a free, powerful code editor with excellent support for Py
 
 ### Recommended Extensions
 
-Install these extensions from the Extensions sidebar (Ctrl+Shift+X / Cmd+Shift+X):
+Install these extensions from the Extensions sidebar ({kbd}`Ctrl+Shift+X` / {kbd}`Cmd+Shift+X`):
 
-- **Python** — Python language support, debugging, and IntelliSense
-- **Jupyter** — run and edit Jupyter notebooks inside VS Code
-- **MyST-Markdown** — syntax highlighting for MyST documents
+:::{list-table} Required Extensions
+:header-rows: 1
+
+* - Extension
+  - Purpose
+* - **Python**
+  - Python language support, debugging, and IntelliSense
+* - **Jupyter**
+  - Run and edit Jupyter notebooks inside VS Code
+* - **MyST-Markdown**
+  - Syntax highlighting for MyST documents
+:::
 
 To install an extension, search for its name and click **Install**.
 
@@ -108,7 +127,9 @@ Open PowerShell and run:
 powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
 ```
 
-Restart your terminal after installation.
+:::{warning}
+You must restart your terminal after installation for `uv` to be available in your PATH.
+:::
 
 ### macOS Installation
 
@@ -118,11 +139,10 @@ Open Terminal and run:
 curl -LsSf https://astral.sh/uv/install.sh | sh
 ```
 
-Alternatively, using Homebrew:
-
-```bash
-brew install uv
-```
+:::{hint}
+:class: dropdown
+**Homebrew alternative:** If you use Homebrew, you can install with `brew install uv` instead.
+:::
 
 ### Linux Installation
 
@@ -137,6 +157,10 @@ Confirm `uv` is installed correctly:
 ```bash
 uv --version
 ```
+
+:::{seealso}
+For more information, visit the [uv documentation](https://docs.astral.sh/uv/).
+:::
 
 ## Part 4: Creating Your First Project
 
@@ -156,7 +180,12 @@ mkdir ~\github
 cd ~\github
 ```
 
-The `~` symbol refers to your home directory (e.g., `/Users/yourname` on macOS or `C:\Users\yourname` on Windows).
+:::{hint}
+The `~` symbol refers to your home directory:
+- **macOS:** `/Users/yourname`
+- **Windows:** `C:\Users\yourname`
+- **Linux:** `/home/yourname`
+:::
 
 ### Initialize a New Project
 
@@ -220,6 +249,10 @@ Verify MyST is installed:
 uv run myst --version
 ```
 
+:::{caution}
+If you see `ModuleNotFoundError`, make sure you're in the `~/github/moma` directory and that `uv add` completed successfully.
+:::
+
 ## Part 6: Running Python Code
 
 ### Using uv run
@@ -252,7 +285,10 @@ This opens a browser window with the JupyterLab interface. You can also open not
 
 In VS Code, create a new file `test_setup.py` in your `moma` folder:
 
-```python
+```{code-block} python
+:filename: test_setup.py
+:linenos:
+
 import numpy as np
 import scipy.optimize as opt
 import matplotlib.pyplot as plt
@@ -278,20 +314,24 @@ Run it:
 uv run python test_setup.py
 ```
 
+:::{tip}
+If successful, you'll see `Minimum at x = 2.0000` and a new `test_plot.png` file in your folder.
+:::
+
 ## Summary
 
-Today we covered:
-
+:::{note} What We Covered
 1. **GitHub** — account creation, Student Developer Pack, and GitHub Desktop
 2. **VS Code** — installation and recommended extensions
 3. **uv** — installation on Windows, macOS, and Linux
 4. **Project initialization** — `uv init` creates a new project
 5. **Dependencies** — `uv add` installs packages
 6. **Running code** — `uv run` for scripts, JupyterLab for notebooks
+:::
 
 ## Homework
 
-:::{note} Assignment 1: Repository Setup
+:::{attention} Assignment 1: Repository Setup
 Publish your local `~/github/moma` folder to GitHub:
 
 1. In GitHub Desktop, select **File > Add Local Repository**
@@ -306,4 +346,11 @@ Publish your local `~/github/moma` folder to GitHub:
 
 :::{tip} Course Materials
 The course website at [jhu-econ.github.io/moma](https://jhu-econ.github.io/moma) contains all lecture notes and materials. Your personal `moma` repository is your workspace for assignments and experimentation.
+:::
+
+:::{seealso} Additional Resources
+- [GitHub Docs](https://docs.github.com) — Official GitHub documentation
+- [VS Code Python Tutorial](https://code.visualstudio.com/docs/python/python-tutorial) — Getting started with Python in VS Code
+- [uv Documentation](https://docs.astral.sh/uv/) — Complete uv reference
+- [MyST Markdown Guide](https://mystmd.org/guide) — Writing scientific documents
 :::
