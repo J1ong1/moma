@@ -1,0 +1,50 @@
+project:
+  type: default
+
+author: "Alan Lujan"
+institute: "Johns Hopkins University"
+
+filters:
+  - theme/live.lua
+
+format:
+  revealjs:
+    theme: [default, theme/dsge.scss]
+    ojs-engine: true
+    menu:
+      side: left
+    slide-number: true
+    date-format: long
+    html-math-method:
+      method: mathjax
+      url: "https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"
+    include-before-body:
+      - text: |
+          <script src="mathjax-config.js"></script>
+    include-after-body:
+      - text: |
+          <script>
+          Reveal.on('ready', hideOnTitle);
+          Reveal.on('slidechanged', hideOnTitle);
+          function hideOnTitle() {
+            const hide = Reveal.getCurrentSlide().id === 'title-slide';
+            const footer = document.querySelector('.footer');
+            const logo = document.querySelector('.slide-logo');
+            if (footer) footer.style.visibility = hide ? 'hidden' : 'visible';
+            if (logo) logo.style.visibility = hide ? 'hidden' : 'visible';
+          }
+          </script>
+    format-resources:
+      - theme/mathjax-config.js
+    incremental: false
+    chalkboard: true
+    preview-links: auto
+    transition: slide
+    background-transition: fade
+    footer: "AS.440.624 Macroeconomic Modeling"
+    logo: theme/krieger.logo.small.horizontal.blue.png
+
+title-slide-attributes:
+  data-background-image: theme/jhu-background.jpg
+  data-background-size: cover
+  data-background-opacity: "1"

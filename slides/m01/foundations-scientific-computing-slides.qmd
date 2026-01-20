@@ -1,0 +1,997 @@
+---
+title: "Foundations of Scientific Computing"
+subtitle: "Python, NumPy, Matplotlib, SciPy, and SymPy"
+format: revealjs
+pyodide:
+  packages:
+    - numpy
+    - matplotlib
+    - scipy
+    - sympy
+---
+
+# Python for Scientific Computing
+
+## The Scientific Python Ecosystem
+
+| Library | Purpose |
+|---------|---------|
+| **NumPy** | Array data structures and operations |
+| **SciPy** | Numerical methods (optimization, integration) |
+| **Matplotlib** | Data visualization |
+| **SymPy** | Symbolic mathematics |
+| **Pandas** | Data manipulation and analysis |
+
+> "We should forget about small efficiencies, say about 97% of the time: premature optimization is the root of all evil." — Donald Knuth
+
+## Why Pure Python Is Slow
+
+Python determines types at runtime (dynamic typing):
+
+```{pyodide}
+a, b = 10, 10
+print(f"a + b = {a + b}")
+
+# Same + operator, different behavior
+c, d = "hello", " world"
+print(f"c + d = {c + d}")
+
+x = [1, 2, 3]
+y = [4, 5, 6]
+print(f"x + y = {x + y}")  # List concatenation!
+```
+
+## The Solution: Vectorization
+
+Delegate operations to optimized C code.
+
+**Non-vectorized:**
+
+```{pyodide}
+import random
+import time
+
+n = 50_000
+start = time.time()
+y = 0
+for i in range(n):
+    x = random.uniform(0, 1)
+    y += x**2
+loop_time = time.time() - start
+print(f"Loop result: {y:.2f}, Time: {loop_time:.4f}s")
+```
+
+## Vectorized Version
+
+**Vectorized:**
+
+```{pyodide}
+import numpy as np
+import time
+
+n = 50_000
+start = time.time()
+x = np.random.uniform(0, 1, n)
+y = np.sum(x**2)
+vec_time = time.time() - start
+print(f"Vectorized result: {y:.2f}, Time: {vec_time:.4f}s")
+```
+
+NumPy generates, squares, and sums all at once in optimized C code.
+
+# NumPy
+
+## Creating Arrays
+
+```{pyodide}
+import numpy as np
+
+# From Python lists
+a = np.array([1, 2, 3, 4, 5])
+print(f"1D array: {a}, dtype: {a.dtype}")
+
+# 2D array
+b = np.array([[1, 2, 3], [4, 5, 6]])
+print(f"2D array shape: {b.shape}")
+print(b)
+
+# Special arrays
+print(f"\nzeros: {np.zeros(3)}")
+print(f"ones: {np.ones(3)}")
+print(f"linspace: {np.linspace(0, 1, 5)}")
+```
+
+## Shape and Reshaping
+
+```{pyodide}
+import numpy as np
+
+z = np.arange(12)
+print(f"Original array: {z}")
+print(f"Shape: {z.shape}")
+
+# Reshape to 2D
+z_2d = z.reshape(3, 4)
+print(f"\nReshaped to (3, 4):\n{z_2d}")
+
+# Reshape to 3D
+z_3d = z.reshape(2, 2, 3)
+print(f"\nReshaped to (2, 2, 3):\n{z_3d}")
+
+# Flatten back to 1D
+print(f"\nFlattened: {z_3d.flatten()}")
+```
+
+## Array Indexing
+
+```{pyodide}
+import numpy as np
+
+z = np.array([[1, 2, 3],
+              [4, 5, 6],
+              [7, 8, 9]])
+print(f"Array:\n{z}")
+
+print(f"\nElement z[0,0]: {z[0, 0]}")
+print(f"First row z[0,:]: {z[0, :]}")
+print(f"Last column z[:,-1]: {z[:, -1]}")
+print(f"Subarray z[0:2, 1:3]:\n{z[0:2, 1:3]}")
+```
+
+## Boolean Indexing
+
+```{pyodide}
+import numpy as np
+
+z = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+print(f"Array: {z}")
+
+# Filter with boolean mask
+mask = z > 5
+print(f"Mask (z > 5): {mask}")
+print(f"Filtered: {z[mask]}")
+
+# Compound conditions
+print(f"3 < z < 8: {z[(z > 3) & (z < 8)]}")
+```
+
+## Element-wise Operations
+
+```{pyodide}
+import numpy as np
+
+a = np.array([1, 2, 3, 4])
+b = np.array([10, 20, 30, 40])
+
+print(f"a = {a}")
+print(f"b = {b}")
+print(f"a + b = {a + b}")
+print(f"a * b = {a * b}")
+print(f"a ** 2 = {a ** 2}")
+print(f"np.sqrt(a) = {np.sqrt(a)}")
+```
+
+## Matrix Operations
+
+```{pyodide}
+import numpy as np
+
+A = np.array([[1, 2], [3, 4]])
+B = np.array([[5, 6], [7, 8]])
+
+print(f"A:\n{A}")
+print(f"\nB:\n{B}")
+print(f"\nA @ B (matrix multiply):\n{A @ B}")
+print(f"\nA * B (element-wise):\n{A * B}")
+```
+
+## Broadcasting
+
+Arrays automatically expand to compatible shapes:
+
+```{pyodide}
+import numpy as np
+
+a = np.array([[1, 2, 3],
+              [4, 5, 6],
+              [7, 8, 9]])
+b = np.array([10, 20, 30])
+
+print(f"a (3x3):\n{a}")
+print(f"b (3,): {b}")
+print(f"\na + b:\n{a + b}")
+```
+
+## Array Methods
+
+```{pyodide}
+import numpy as np
+
+a = np.array([3, 1, 4, 1, 5, 9, 2, 6])
+print(f"Array: {a}")
+print(f"Sum: {a.sum()}")
+print(f"Mean: {a.mean():.4f}")
+print(f"Std: {a.std():.4f}")
+print(f"Min: {a.min()}, Max: {a.max()}")
+print(f"Argmax: {a.argmax()}")
+print(f"Sorted: {np.sort(a)}")
+```
+
+## Linear Algebra
+
+```{pyodide}
+import numpy as np
+
+A = np.array([[4, 2], [1, 3]])
+b = np.array([1, 2])
+
+print(f"Solving Ax = b")
+print(f"A:\n{A}")
+print(f"b: {b}")
+
+x = np.linalg.solve(A, b)
+print(f"\nSolution x: {x}")
+print(f"Verification A @ x: {A @ x}")
+print(f"\nDeterminant: {np.linalg.det(A):.4f}")
+```
+
+## Eigenvalues
+
+```{pyodide}
+import numpy as np
+
+A = np.array([[2, 1], [1, 2]])
+eigenvalues, eigenvectors = np.linalg.eig(A)
+
+print(f"Matrix A:\n{A}")
+print(f"\nEigenvalues: {eigenvalues}")
+print(f"\nEigenvectors:\n{eigenvectors}")
+```
+
+## Random Numbers
+
+```{pyodide}
+import numpy as np
+np.random.seed(42)
+
+print(f"Uniform[0,1]: {np.random.uniform(0, 1, 5)}")
+print(f"Normal(0,1): {np.random.randn(5)}")
+print(f"Integers [1,10): {np.random.randint(1, 10, 5)}")
+print(f"Choice: {np.random.choice(['a', 'b', 'c'], 5)}")
+```
+
+## Mutability and Copying
+
+```{pyodide}
+import numpy as np
+
+# Assignment creates a reference, not a copy!
+a = np.array([1, 2, 3, 4, 5])
+b = a  # b points to same data as a
+
+b[0] = 999
+print(f"After modifying b[0]:")
+print(f"a = {a}")  # a is also modified!
+print(f"b = {b}")
+```
+
+## Creating Independent Copies
+
+```{pyodide}
+import numpy as np
+
+a = np.array([1, 2, 3, 4, 5])
+c = np.copy(a)  # Independent copy
+
+c[0] = 999
+print(f"After modifying copy c[0]:")
+print(f"a = {a}")  # a is unchanged
+print(f"c = {c}")
+
+# Slices also create views, not copies
+d = a[1:4]
+d[0] = 888
+print(f"\nAfter modifying slice d[0]:")
+print(f"a = {a}")  # a is modified!
+```
+
+# Matplotlib
+
+## Two API Approaches
+
+**MATLAB-style (implicit):**
+
+```{pyodide}
+import matplotlib.pyplot as plt
+import numpy as np
+
+x = np.linspace(0, 2*np.pi, 200)
+plt.plot(x, np.sin(x))
+plt.title('MATLAB-style')
+plt.show()
+```
+
+## Object-Oriented API (Recommended)
+
+```{pyodide}
+import matplotlib.pyplot as plt
+import numpy as np
+
+x = np.linspace(0, 2*np.pi, 200)
+
+fig, ax = plt.subplots()
+ax.plot(x, np.sin(x), 'b-', linewidth=2)
+ax.set_xlabel('x')
+ax.set_ylabel(r'$\sin(x)$')
+ax.set_title('Object-oriented style')
+plt.show()
+```
+
+## Multiple Lines
+
+```{pyodide}
+import matplotlib.pyplot as plt
+import numpy as np
+
+x = np.linspace(0, 2*np.pi, 200)
+
+fig, ax = plt.subplots()
+ax.plot(x, np.sin(x), label=r'$\sin(x)$')
+ax.plot(x, np.cos(x), label=r'$\cos(x)$')
+ax.set_xlabel('x')
+ax.legend()
+ax.grid(True, alpha=0.3)
+plt.show()
+```
+
+## Line Styles and Markers
+
+```{pyodide}
+import matplotlib.pyplot as plt
+import numpy as np
+
+x = np.linspace(0, 4, 10)
+
+fig, ax = plt.subplots()
+ax.plot(x, x, 'ro-', label='circles')
+ax.plot(x, x + 1, 'gs--', label='squares')
+ax.plot(x, x + 2, 'b^:', label='triangles')
+ax.legend()
+ax.set_title('Line Styles and Markers')
+plt.show()
+```
+
+## Subplots
+
+```{pyodide}
+import matplotlib.pyplot as plt
+import numpy as np
+
+x = np.linspace(0, 2*np.pi, 200)
+
+fig, axes = plt.subplots(2, 2, figsize=(8, 6))
+axes[0, 0].plot(x, np.sin(x)); axes[0, 0].set_title('sin(x)')
+axes[0, 1].plot(x, np.cos(x)); axes[0, 1].set_title('cos(x)')
+axes[1, 0].plot(x, np.exp(-x)); axes[1, 0].set_title('exp(-x)')
+axes[1, 1].plot(x, x**2); axes[1, 1].set_title(r'$x^2$')
+plt.tight_layout()
+plt.show()
+```
+
+## Scatter Plots
+
+```{pyodide}
+import matplotlib.pyplot as plt
+import numpy as np
+np.random.seed(42)
+
+x = np.random.randn(100)
+y = 2*x + np.random.randn(100) * 0.5
+
+fig, ax = plt.subplots()
+ax.scatter(x, y, alpha=0.6)
+ax.set_xlabel('x')
+ax.set_ylabel('y')
+ax.set_title('Scatter Plot')
+plt.show()
+```
+
+## Histograms
+
+```{pyodide}
+import matplotlib.pyplot as plt
+import numpy as np
+np.random.seed(42)
+
+data = np.random.randn(1000)
+
+fig, ax = plt.subplots()
+ax.hist(data, bins=30, edgecolor='black', alpha=0.7)
+ax.axvline(data.mean(), color='red', linestyle='--', label=f'Mean: {data.mean():.2f}')
+ax.set_xlabel('Value')
+ax.set_ylabel('Frequency')
+ax.legend()
+plt.show()
+```
+
+## Contour Plots
+
+```{pyodide}
+import matplotlib.pyplot as plt
+import numpy as np
+
+x = np.linspace(-3, 3, 100)
+y = np.linspace(-3, 3, 100)
+X, Y = np.meshgrid(x, y)
+Z = np.exp(-(X**2 + Y**2))
+
+fig, ax = plt.subplots()
+cs = ax.contourf(X, Y, Z, levels=20, cmap='viridis')
+plt.colorbar(cs, ax=ax)
+ax.set_title(r'$e^{-(x^2+y^2)}$')
+plt.show()
+```
+
+## 3D Surface Plots
+
+```{pyodide}
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
+import numpy as np
+
+x = np.linspace(-2, 2, 50)
+y = np.linspace(-2, 2, 50)
+X, Y = np.meshgrid(x, y)
+Z = np.sin(np.sqrt(X**2 + Y**2))
+
+fig = plt.figure(figsize=(8, 6))
+ax = fig.add_subplot(111, projection='3d')
+ax.plot_surface(X, Y, Z, cmap='viridis', alpha=0.8)
+ax.set_xlabel('x')
+ax.set_ylabel('y')
+ax.set_zlabel('z')
+ax.set_title(r'$z = \sin(\sqrt{x^2 + y^2})$')
+plt.show()
+```
+
+## Economic Example: Supply and Demand
+
+```{pyodide}
+import matplotlib.pyplot as plt
+import numpy as np
+
+q = np.linspace(1, 10, 100)
+demand = 12 - q
+supply = 2 + q
+
+fig, ax = plt.subplots()
+ax.plot(q, demand, 'b-', lw=2, label='Demand')
+ax.plot(q, supply, 'r-', lw=2, label='Supply')
+ax.plot(5, 7, 'ko', ms=10)
+ax.annotate('Equilibrium', xy=(5, 7), xytext=(6, 8),
+            arrowprops=dict(arrowstyle='->'))
+ax.set_xlabel('Quantity')
+ax.set_ylabel('Price')
+ax.legend()
+ax.grid(True, alpha=0.3)
+plt.show()
+```
+
+# SciPy
+
+## Overview
+
+SciPy builds on NumPy for scientific computing:
+
+- `scipy.stats` - Statistical distributions
+- `scipy.optimize` - Optimization and root-finding
+- `scipy.integrate` - Numerical integration
+- `scipy.linalg` - Linear algebra (extended)
+
+## Statistical Distributions
+
+```{pyodide}
+from scipy.stats import norm
+import numpy as np
+
+# Standard normal distribution
+print(f"PDF at x=0: {norm.pdf(0):.4f}")
+print(f"CDF at x=0: {norm.cdf(0):.4f}")
+print(f"95th percentile: {norm.ppf(0.95):.4f}")
+print(f"Mean: {norm.mean()}, Var: {norm.var()}")
+
+# Generate random samples
+samples = norm.rvs(size=5)
+print(f"Random samples: {samples}")
+```
+
+## Visualizing Distributions
+
+```{pyodide}
+from scipy.stats import norm, t
+import matplotlib.pyplot as plt
+import numpy as np
+
+x = np.linspace(-4, 4, 200)
+
+fig, ax = plt.subplots()
+ax.plot(x, norm.pdf(x), label='Normal')
+ax.plot(x, t.pdf(x, df=3), label='t (df=3)')
+ax.plot(x, t.pdf(x, df=10), label='t (df=10)')
+ax.legend()
+ax.set_title('Probability Density Functions')
+plt.show()
+```
+
+## Beta Distribution
+
+```{pyodide}
+from scipy.stats import beta
+import matplotlib.pyplot as plt
+import numpy as np
+
+x = np.linspace(0, 1, 200)
+
+fig, ax = plt.subplots()
+for a, b in [(2, 2), (2, 5), (5, 2), (1, 3)]:
+    ax.plot(x, beta.pdf(x, a, b), label=f'a={a}, b={b}')
+ax.legend()
+ax.set_title('Beta Distributions')
+ax.set_xlabel('x')
+plt.show()
+```
+
+## Linear Regression
+
+```{pyodide}
+from scipy.stats import linregress
+import matplotlib.pyplot as plt
+import numpy as np
+
+np.random.seed(42)
+x = np.linspace(0, 10, 50)
+y = 2*x + 1 + np.random.randn(50) * 2
+
+slope, intercept, r, p, se = linregress(x, y)
+print(f"Slope: {slope:.4f}, Intercept: {intercept:.4f}")
+print(f"R-squared: {r**2:.4f}, p-value: {p:.4e}")
+
+fig, ax = plt.subplots()
+ax.scatter(x, y, alpha=0.6)
+ax.plot(x, slope*x + intercept, 'r-', label=f'y = {slope:.2f}x + {intercept:.2f}')
+ax.legend()
+plt.show()
+```
+
+## Root Finding
+
+```{pyodide}
+from scipy.optimize import brentq, newton
+import numpy as np
+
+# Find root of f(x) = x^3 - x - 1
+def f(x):
+    return x**3 - x - 1
+
+# Brentq requires bracketing interval
+root_brentq = brentq(f, 1, 2)
+print(f"Brentq root: {root_brentq:.6f}")
+print(f"f(root) = {f(root_brentq):.2e}")
+
+# Newton's method requires initial guess
+root_newton = newton(f, 1.5)
+print(f"Newton root: {root_newton:.6f}")
+```
+
+## Visualizing Root Finding
+
+```{pyodide}
+from scipy.optimize import brentq
+import matplotlib.pyplot as plt
+import numpy as np
+
+def f(x):
+    return x**3 - x - 1
+
+x = np.linspace(0, 2, 100)
+root = brentq(f, 1, 2)
+
+fig, ax = plt.subplots()
+ax.plot(x, f(x), 'b-', label=r'$f(x) = x^3 - x - 1$')
+ax.axhline(0, color='k', linestyle='--', alpha=0.3)
+ax.plot(root, 0, 'ro', markersize=10, label=f'Root: x = {root:.4f}')
+ax.legend()
+ax.set_xlabel('x')
+ax.set_ylabel('f(x)')
+plt.show()
+```
+
+## Fixed Points
+
+A fixed point satisfies $x = g(x)$. Use `fixed_point` to find it:
+
+```{pyodide}
+from scipy.optimize import fixed_point
+import numpy as np
+
+# Find fixed point of g(x) = cos(x)
+# i.e., solve x = cos(x)
+def g(x):
+    return np.cos(x)
+
+fp = fixed_point(g, 1.0)  # Starting guess
+print(f"Fixed point: x = {fp:.6f}")
+print(f"Verification: cos({fp:.6f}) = {np.cos(fp):.6f}")
+
+# Another example: x = sqrt(x + 1)
+def h(x):
+    return np.sqrt(x + 1)
+
+fp2 = fixed_point(h, 1.0)
+print(f"\nFixed point of sqrt(x+1): x = {fp2:.6f}")
+print(f"Verification: sqrt({fp2:.6f} + 1) = {np.sqrt(fp2 + 1):.6f}")
+```
+
+## Optimization
+
+```{pyodide}
+from scipy.optimize import minimize_scalar, minimize
+import numpy as np
+
+# Univariate minimization
+def f(x):
+    return (x - 2)**2 + 1
+
+result = minimize_scalar(f, bounds=(0, 5), method='bounded')
+print(f"Minimum at x = {result.x:.4f}")
+print(f"Minimum value = {result.fun:.4f}")
+```
+
+## Multivariate Optimization
+
+```{pyodide}
+from scipy.optimize import minimize
+import numpy as np
+
+# Rosenbrock function
+def rosenbrock(x):
+    return (1 - x[0])**2 + 100*(x[1] - x[0]**2)**2
+
+x0 = [0, 0]
+result = minimize(rosenbrock, x0, method='BFGS')
+
+print(f"Minimum at: {result.x}")
+print(f"Minimum value: {result.fun:.6f}")
+print(f"Converged: {result.success}")
+```
+
+## Visualizing Optimization
+
+```{pyodide}
+from scipy.optimize import minimize
+import matplotlib.pyplot as plt
+import numpy as np
+
+def rosenbrock(x):
+    return (1 - x[0])**2 + 100*(x[1] - x[0]**2)**2
+
+x = np.linspace(-2, 2, 100)
+y = np.linspace(-1, 3, 100)
+X, Y = np.meshgrid(x, y)
+Z = (1 - X)**2 + 100*(Y - X**2)**2
+
+fig, ax = plt.subplots()
+cs = ax.contour(X, Y, np.log(Z + 1), levels=20, cmap='viridis')
+ax.plot(1, 1, 'r*', markersize=15, label='Minimum (1, 1)')
+ax.legend()
+ax.set_title('Rosenbrock Function (log scale)')
+plt.show()
+```
+
+## Numerical Integration
+
+```{pyodide}
+from scipy.integrate import quad
+import numpy as np
+
+# Integrate x^2 from 0 to 1
+def f(x):
+    return x**2
+
+result, error = quad(f, 0, 1)
+print(f"Integral of x^2 from 0 to 1: {result:.6f}")
+print(f"Error estimate: {error:.2e}")
+print(f"Exact answer: {1/3:.6f}")
+
+# Integrate normal PDF
+from scipy.stats import norm
+result, _ = quad(norm.pdf, -1.96, 1.96)
+print(f"\nP(-1.96 < Z < 1.96) = {result:.4f}")
+```
+
+## Application: Option Pricing
+
+```{pyodide}
+from scipy.integrate import quad
+from scipy.stats import lognorm
+import numpy as np
+
+# European call option pricing via integration
+mu, sigma = 4, 0.25  # Log-normal parameters
+K = 40  # Strike price
+beta = 0.99  # Discount factor
+n = 10  # Periods
+
+def payoff_density(S):
+    return np.maximum(S - K, 0) * lognorm.pdf(S, sigma, scale=np.exp(mu))
+
+price, error = quad(payoff_density, 0, 200)
+price *= beta**n
+
+print(f"Option price (integration): ${price:.2f}")
+
+# Monte Carlo comparison
+np.random.seed(42)
+M = 100_000
+S = np.exp(mu + sigma * np.random.randn(M))
+mc_price = beta**n * np.mean(np.maximum(S - K, 0))
+print(f"Option price (Monte Carlo): ${mc_price:.2f}")
+```
+
+# SymPy
+
+## Overview
+
+SymPy provides **symbolic mathematics** in Python:
+
+- Algebraic manipulation (expand, factor, simplify)
+- Equation solving
+- Calculus (limits, derivatives, integrals)
+- Series and summations
+
+Unlike NumPy/SciPy which compute numerical values, SymPy manipulates mathematical expressions symbolically.
+
+## Creating Symbols
+
+```{pyodide}
+from sympy import symbols, expand, factor, simplify
+
+# Create symbolic variables
+x, y, z = symbols('x y z')
+
+# Build expressions
+expr = (x + y)**2
+print(f"Expression: {expr}")
+
+# Expand
+expanded = expand(expr)
+print(f"Expanded: {expanded}")
+
+# Factor back
+factored = factor(expanded)
+print(f"Factored: {factored}")
+```
+
+## Solving Equations
+
+```{pyodide}
+from sympy import symbols, solve, Eq
+
+x, y = symbols('x y')
+
+# Solve x^2 - 4 = 0
+solutions = solve(x**2 - 4, x)
+print(f"Solutions to x^2 - 4 = 0: {solutions}")
+
+# Solve a system of equations
+eq1 = Eq(x + y, 10)
+eq2 = Eq(x - y, 2)
+solution = solve([eq1, eq2], [x, y])
+print(f"\nSystem solution: {solution}")
+```
+
+## Symbolic Calculus: Limits
+
+```{pyodide}
+from sympy import symbols, limit, sin, oo
+
+x = symbols('x')
+
+# Classic limit: sin(x)/x as x -> 0
+lim1 = limit(sin(x)/x, x, 0)
+print(f"lim(sin(x)/x) as x->0: {lim1}")
+
+# Limit at infinity
+lim2 = limit((x**2 + 1)/(x**2 - 1), x, oo)
+print(f"lim((x^2+1)/(x^2-1)) as x->inf: {lim2}")
+
+# One-sided limit
+lim3 = limit(1/x, x, 0, '+')
+print(f"lim(1/x) as x->0+: {lim3}")
+```
+
+## Symbolic Calculus: Derivatives
+
+```{pyodide}
+from sympy import symbols, diff, sin, cos, exp
+
+x = symbols('x')
+
+# First derivative
+f = x**3 + 2*x**2 - 5*x + 1
+df = diff(f, x)
+print(f"f(x) = {f}")
+print(f"f'(x) = {df}")
+
+# Chain rule automatically applied
+g = sin(x**2)
+dg = diff(g, x)
+print(f"\ng(x) = {g}")
+print(f"g'(x) = {dg}")
+
+# Higher derivatives
+d2f = diff(f, x, 2)
+print(f"\nf''(x) = {d2f}")
+```
+
+## Symbolic Calculus: Integration
+
+```{pyodide}
+from sympy import symbols, integrate, exp, oo
+
+x = symbols('x')
+
+# Indefinite integral
+f = x**2
+F = integrate(f, x)
+print(f"Integral of {f}: {F}")
+
+# Definite integral
+area = integrate(x**2, (x, 0, 1))
+print(f"\nIntegral of x^2 from 0 to 1: {area}")
+
+# Improper integral (exponential distribution)
+lam = symbols('lambda', positive=True)
+pdf = lam * exp(-lam * x)
+total = integrate(pdf, (x, 0, oo))
+print(f"\nIntegral of lambda*exp(-lambda*x) from 0 to inf: {total}")
+```
+
+## Series and Summations
+
+```{pyodide}
+from sympy import symbols, Sum, oo, simplify
+
+i, n = symbols('i n', integer=True)
+r = symbols('r', positive=True)
+
+# Geometric series: sum of r^i from i=0 to n
+geo_finite = Sum(r**i, (i, 0, n))
+print(f"Finite geometric series: {geo_finite} = {geo_finite.doit()}")
+
+# Infinite geometric series (|r| < 1)
+geo_infinite = Sum(r**i, (i, 0, oo))
+result = geo_infinite.doit()
+print(f"\nInfinite geometric series: {geo_infinite} = {result}")
+```
+
+## Substitution and Evaluation
+
+```{pyodide}
+from sympy import symbols, sqrt, N
+
+x, y, a, b = symbols('x y a b')
+
+# Create expression
+expr = a*x**2 + b*x + 1
+
+# Substitute values
+expr_sub = expr.subs({a: 2, b: -3})
+print(f"Original: {expr}")
+print(f"After substitution (a=2, b=-3): {expr_sub}")
+
+# Evaluate at x=1
+value = expr_sub.subs(x, 1)
+print(f"At x=1: {value}")
+
+# Numerical evaluation
+expr2 = sqrt(2)
+print(f"\nsqrt(2) symbolically: {expr2}")
+print(f"sqrt(2) numerically: {N(expr2, 10)}")
+```
+
+## Economic Application: Cobb-Douglas
+
+```{pyodide}
+from sympy import symbols, diff, solve, Eq
+
+# Cobb-Douglas production function
+K, L, A, alpha = symbols('K L A alpha', positive=True)
+Y = A * K**alpha * L**(1-alpha)
+
+print(f"Production function: Y = {Y}")
+
+# Marginal products
+MPK = diff(Y, K)
+MPL = diff(Y, L)
+print(f"\nMarginal product of capital: {MPK}")
+print(f"Marginal product of labor: {MPL}")
+
+# Verify Euler's theorem: K*MPK + L*MPL = Y
+euler = K*MPK + L*MPL
+from sympy import simplify
+print(f"\nK*MPK + L*MPL = {simplify(euler)}")
+```
+
+## Economic Application: Utility Maximization
+
+```{pyodide}
+from sympy import symbols, diff, solve, Eq, simplify
+
+x, y, p_x, p_y, I, alpha = symbols('x y p_x p_y I alpha', positive=True)
+
+# Cobb-Douglas utility
+U = x**alpha * y**(1-alpha)
+
+# Budget constraint: p_x*x + p_y*y = I
+# Lagrangian approach: MRS = price ratio
+MRS = diff(U, x) / diff(U, y)
+price_ratio = p_x / p_y
+
+# Solve MRS = price ratio
+opt_condition = solve(Eq(MRS, price_ratio), y)[0]
+print(f"Optimal y in terms of x: y = {opt_condition}")
+
+# Substitute into budget constraint and solve for x
+budget = Eq(p_x*x + p_y*opt_condition, I)
+x_star = solve(budget, x)[0]
+print(f"\nOptimal x*: {simplify(x_star)}")
+```
+
+# Summary
+
+## Key Takeaways
+
+**Python for Scientific Computing**
+
+- Vectorization avoids slow Python loops
+- NumPy, SciPy, Matplotlib form the core stack
+
+**NumPy**
+
+- Homogeneous arrays with fast operations
+- Broadcasting for flexible arithmetic
+- Linear algebra via `np.linalg`
+
+## Key Takeaways (continued)
+
+**Matplotlib**
+
+- Object-oriented API: `fig, ax = plt.subplots()`
+- Extensive customization options
+- LaTeX support for mathematical notation
+
+**SciPy**
+
+- Statistical distributions in `scipy.stats`
+- Root finding and optimization in `scipy.optimize`
+- Numerical integration in `scipy.integrate`
+
+## Key Takeaways (continued)
+
+**SymPy**
+
+- Symbolic mathematics vs numerical computation
+- Algebraic manipulation: `expand()`, `factor()`, `solve()`
+- Calculus: `limit()`, `diff()`, `integrate()`
+- Economic applications: marginal products, optimization
+
+## Further Reading
+
+- [Python for Scientific Computing](https://python-programming.quantecon.org/need_for_speed.html)
+- [NumPy](https://python-programming.quantecon.org/numpy.html)
+- [Matplotlib](https://python-programming.quantecon.org/matplotlib.html)
+- [SciPy](https://python-programming.quantecon.org/scipy.html)
+- [SymPy](https://python-programming.quantecon.org/sympy.html)
+
+All lectures from [QuantEcon: Python Programming for Economics and Finance](https://python-programming.quantecon.org/intro.html)
