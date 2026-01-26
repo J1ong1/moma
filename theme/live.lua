@@ -11,6 +11,12 @@ local live_options = {
   ["grading"] = true,
 }
 
+-- Default versions for Pyodide and webR (can be overridden via document metadata)
+local default_versions = {
+  pyodide = "0.28.1",
+  webr = "0.5.4",
+}
+
 local ojs_definitions = {
   contents = {},
 }
@@ -25,7 +31,7 @@ local function json_as_b64(obj)
 end
 
 local function tree(root)
-  function isdir(path)
+  local function isdir(path)
     -- Is there a better OS agnostic way to do this?
     local ok, err, code = os.rename(path .. "/", path .. "/")
     if not ok then
@@ -37,7 +43,7 @@ local function tree(root)
     return ok, err
   end
 
-  function gather(path, list)
+  local function gather(path, list)
     if (isdir(path)) then
       -- For each item in this dir, recurse for subdir content
       local items = pandoc.system.list_directory(path)
@@ -76,7 +82,7 @@ function ParseBlock(block, engine)
   -- Parse quarto-style yaml attributes
   local param_yaml = table.concat(param_lines, "\n")
   if (param_yaml ~= "") then
-    param_attr = tinyyaml.parse(param_yaml)
+    local param_attr = tinyyaml.parse(param_yaml)
     for k, v in pairs(param_attr) do
       attr[k] = v
     end
@@ -171,7 +177,7 @@ end
 function PyodideCodeBlock(code)
   block_id = block_id + 1
 
-  function append_ojs_template(template, template_vars)
+  local function append_ojs_template(template, template_vars)
     local file = io.open(quarto.utils.resolve_path("templates/" .. template), "r")
     assert(file)
     local content = file:read("*a")
@@ -284,7 +290,7 @@ end
 function WebRCodeBlock(code)
   block_id = block_id + 1
 
-  function append_ojs_template(template, template_vars)
+  local function append_ojs_template(template, template_vars)
     local file = io.open(quarto.utils.resolve_path("templates/" .. template), "r")
     assert(file)
     local content = file:read("*a")
@@ -401,9 +407,9 @@ function InterpolatedBlock(block, language)
   block_id = block_id + 1
 
   -- Reactively render OJS variables in codeblocks
-  file = io.open(quarto.utils.resolve_path("templates/interpolate.ojs"), "r")
+  local file = io.open(quarto.utils.resolve_path("templates/interpolate.ojs"), "r")
   assert(file)
-  content = file:read("*a")
+  local content = file:read("*a")
 
   -- Build map of OJS variable names to JS template literals
   local map = "{\n"
@@ -463,7 +469,7 @@ end
 function HTMLWidget(block_id)
   local file = io.open(quarto.utils.resolve_path("templates/webr-widget.ojs"), "r")
   assert(file)
-  content = file:read("*a")
+  local content = file:read("*a")
 
   table.insert(ojs_definitions.contents, 1, {
     methodName = "interpretQuiet",
@@ -527,8 +533,14 @@ function setupPyodide(doc)
   end
 
   -- Initial Pyodide startup options
+  -- Version can be overridden via pyodide.version in document metadata
+  local pyodide_version = default_versions.pyodide
+  if (pyodide["version"]) then
+    pyodide_version = pandoc.utils.stringify(pyodide["version"])
+  end
+
   local pyodide_options = {
-    indexURL = "https://cdn.jsdelivr.net/pyodide/v0.28.1/full/",
+    indexURL = "https://cdn.jsdelivr.net/pyodide/v" .. pyodide_version .. "/full/",
     env = {
       PLOTLY_RENDERER = 'plotly_mimetype',
     }
@@ -595,8 +607,14 @@ function setupWebR(doc)
   end
 
   -- Initial webR startup options
+  -- Version can be overridden via webr.version in document metadata
+  local webr_version = default_versions.webr
+  if (webr["version"]) then
+    webr_version = pandoc.utils.stringify(webr["version"])
+  end
+
   local webr_options = {
-    baseUrl = "https://webr.r-wasm.org/v0.5.4/",
+    baseUrl = "https://webr.r-wasm.org/v" .. webr_version .. "/",
   }
   if (webr["engine-url"]) then
     webr_options["baseUrl"] = pandoc.utils.stringify(webr["engine-url"])
@@ -662,6 +680,7 @@ function Pandoc(doc)
 
   -- Copy resources for upload to VFS at runtime
   local vfs_files = {}
+  local resource_list
   if (webr and webr.resources) then
     resource_list = webr.resources
   elseif (pyodide and pyodide.resources) then

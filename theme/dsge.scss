@@ -5,7 +5,6 @@
 $jet: #131516;
 $accent: #107895;
 $accent2: #9a2515;
-// $accent2: #e64173;
 $right-arrow: "\2192"; // Unicode character for right arrow
 
 // fonts
@@ -31,12 +30,9 @@ $presentation-heading-font: "Roboto", sans-serif !default;
 
 $presentation-heading-color: $jet !default;
 $presentation-heading-font-weight: lighter;
-//$presentation-heading-line-height: 2;
-//$presentation-block-margin: 28px;
 $presentation-font-size-root: 32px;
 
 // colors
-//$body-bg: #f0f1eb !default;
 $body-color: $jet !default;
 $link-color: $accent !default;
 $selection-bg: #26351c !default;
@@ -49,7 +45,6 @@ $selection-bg: #26351c !default;
 }
 
 .reveal p {
-  // font-weight: 300;
   font-weight: lighter;
   margin-top: 1.25em;
 }
@@ -86,7 +81,6 @@ $selection-bg: #26351c !default;
   .title {
     color: $body-color;
     font-size: 1.4em;
-    // font-weight: 350;
     font-weight: lighter;
   }
 
@@ -101,8 +95,6 @@ $selection-bg: #26351c !default;
   .quarto-title-affiliation,
   .quarto-title-author-email {
     font-style: italic;
-    // font-size: 80%;
-    // color: #7F7F7F;
   }
 
   .author,
@@ -125,7 +117,6 @@ $selection-bg: #26351c !default;
 
 
 .reveal h2 {
-  // font-weight: 350;
   font-weight: lighter;
   font-size: 1.4em;
 }
@@ -133,14 +124,12 @@ $selection-bg: #26351c !default;
 .reveal h3 {
   color: $accent;
   font-style: italic;
-  // font-weight: 350;
   font-weight: lighter;
   font-size: 0.95em;
 }
 
 .reveal h4 {
   color: $accent2;
-  // font-weight: 350;
   font-weight: normal;
   margin-top: 1.25em;
 }
@@ -167,7 +156,6 @@ $selection-bg: #26351c !default;
 // Unordered lists
 
 .reveal ul {
-  // font-weight: 300;
   font-weight: lighter;
   padding-left: 16px;
 
@@ -192,7 +180,6 @@ $selection-bg: #26351c !default;
 // Ordered lists
 
 .reveal ol {
-  // font-weight: 300;
   font-weight: lighter;
   padding-left: 16px;
 
@@ -246,7 +233,10 @@ $selection-bg: #26351c !default;
 }
 
 // Add background box to logo when title slide is active
-body:has(#title-slide.present) .slide-logo {
+// Note: :has() requires Safari 15.4+, Chrome 105+, Firefox 121+
+// Fallback class .title-slide-active is added via JavaScript for older browsers
+body:has(#title-slide.present) .slide-logo,
+body.title-slide-active .slide-logo {
   background-color: rgba(255, 255, 255, 0.85) !important;
   padding: 0.5em !important;
   border-radius: 5px !important;
@@ -263,7 +253,9 @@ body:has(#title-slide.present) .slide-logo {
 }
 
 // Add background to footer when title slide is active
-body:has(#title-slide.present) .footer.footer-default {
+// Fallback class .title-slide-active is added via JavaScript for older browsers
+body:has(#title-slide.present) .footer.footer-default,
+body.title-slide-active .footer.footer-default {
   background-color: rgba(255, 255, 255, 0.85) !important;
   padding: 0.5em 1em !important;
   border-radius: 5px !important;
@@ -302,8 +294,8 @@ body:has(#title-slide.present) .footer.footer-default {
 }
 
 .button:hover {
-  background-color: #0056b3;
-  border-color: #0056b3;
+  background-color: darken($accent, 10%);
+  border-color: darken($accent, 10%);
 }
 
 .button::before {
@@ -314,7 +306,6 @@ body:has(#title-slide.present) .footer.footer-default {
 // tables
 
 .reveal table {
-  // height: auto; /* Adjust table width to fit content up to the available slide space */
   margin: auto;
   border-collapse: collapse;
   border-spacing: 0;
