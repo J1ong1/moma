@@ -53,8 +53,8 @@ project:
       title: Slides
     - title: Notebooks
       children:
-        - file: notebooks/olg_extra.md
         - file: notebooks/consumption_two_period.md
+        - file: notebooks/olg_extra.md
     - file: quantecon/README.md
       title: QuantEcon
       children:

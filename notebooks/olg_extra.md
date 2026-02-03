@@ -62,6 +62,8 @@ $\beth = 0.99$ (social planner discount factor).
 import numpy as np
 from scipy import optimize
 import matplotlib.pyplot as plt
+import sympy as sp
+import pandas as pd
 ```
 
 ```{code-cell} ipython3
@@ -327,6 +329,20 @@ def steady_state_competitive(epsilon, beta, N):
     """Steady-state capital in the competitive equilibrium."""
     Q = Q_coefficient(epsilon, beta, N)
     return Q**(1 / (1 - epsilon))
+```
+
+We can verify the steady-state formula symbolically.  Setting
+$k_{t+1} = k_t = \bar{k}$ in [the law of motion](#law_of_motion)
+gives $\bar{k} = \mathcal{Q}\,\bar{k}^\varepsilon$.  Solving for
+$\bar{k}$:
+
+```{code-cell} ipython3
+k_sym, Q_sym, eps_sym = sp.symbols('k Q varepsilon', positive=True)
+
+# Steady-state condition: k = Q * k^epsilon
+ss_eq = sp.Eq(k_sym, Q_sym * k_sym**eps_sym)
+k_star_symbolic = sp.solve(ss_eq, k_sym)
+display(sp.Eq(sp.Symbol(r'\bar{k}'), k_star_symbolic[0]))
 ```
 
 ### Phase Diagram and Convergence
@@ -602,11 +618,27 @@ ax.set_xlim(0, k_grid[-1])
 ax.legend(fontsize=9, loc='upper right')
 ax.grid(True, alpha=0.3)
 plt.show()
+```
 
-print(f"Competitive equilibrium:  k_bar   = {k_bar:.4f}")
-print(f"Social optimum:           k_bar*  = {k_star:.4f}")
-print(f"Golden Rule:              k_bar** = {k_gold:.4f}")
-print(f"Zero consumption:         k_0     = {k_zero:.4f}")
+The following table summarizes the three steady states and their
+associated prices and consumption levels.
+
+```{code-cell} ipython3
+rows = []
+for label, kv in [('Competitive $\\bar{k}$', k_bar),
+                   ('Social optimum $\\bar{k}^*$', k_star),
+                   ('Golden Rule $\\bar{k}^{**}$', k_gold)]:
+    W_v = wage(kv, epsilon)
+    R_v = interest_rate(kv, epsilon)
+    c1_v = W_v / (1 + beta)
+    c2_v = R_v * beta / (1 + beta) * W_v
+    c_v = kv**epsilon - n * kv
+    rows.append({'Steady state': label, 'k': kv, 'W': W_v, 'R': R_v,
+                 'c1': c1_v, 'c2': c2_v, 'c_bar': c_v})
+
+df = pd.DataFrame(rows).set_index('Steady state').round(4)
+print(f"Zero-consumption capital:  k_0 = {k_zero:.4f}")
+df
 ```
 
 ## Pareto Efficiency Across Generations
